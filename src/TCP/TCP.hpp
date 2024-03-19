@@ -23,3 +23,11 @@ public:
   void send_msg() override;
   void recv_msg() override;
 };
+
+class Client : public TCP {
+public:
+  Client(int ip, int port);
+
+  void send_msg() override;
+  void recv_msg() override;
+};
