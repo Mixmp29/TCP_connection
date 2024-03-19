@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <netinet/in.h>
 #include <pthread.h>
+#include <string.h>
 #include <sys/socket.h>
 
 #define BUFLEN 81
