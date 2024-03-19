@@ -6,6 +6,7 @@
 #include <pthread.h>
 #include <string.h>
 #include <sys/socket.h>
+#include <vector>
 
 #define BUFLEN 81
 #define NTHRDS 5
@@ -25,11 +26,14 @@ protected:
 class Server : public TCP {
 public:
   Server();
+  void in_work();
+  int threadclient(void *sockClient);
 
   void send_msg() override;
   void recv_msg() override;
 
 private:
+  std::vector<int> sockets;
   pthread_t thrds[NTHRDS];
 };
 
