@@ -4,6 +4,12 @@
 #include <sys/socket.h>
 
 class TCP {
+public:
+  virtual void connection(int Socket, int Port);
+  virtual void send_msg();
+  virtual void recv_msg();
+
+protected:
   int sockMain;
   int sockConnect;
   int length;
