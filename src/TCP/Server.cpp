@@ -22,3 +22,20 @@ Server::Server() {
 
   listen(sockMain, NTHRDS);
 }
+
+void Server::in_work() {
+  if ((sockConnect = accept(sockMain, 0, 0)) < 0) {
+    perror("Неверный socket для клиента.");
+    exit(1);
+  }
+
+  sockets.push_back(sockConnect);
+
+  printf("sockClient: %d\n", sockConnect);
+
+  if (pthread_create(&thrds[sockConnect], NULL, (void *(*)(void *))threadclient,
+                     (void *)&sockConnect) < 0) {
+    perror("Ошибка создания потока.");
+    exit(1);
+  }
+}
