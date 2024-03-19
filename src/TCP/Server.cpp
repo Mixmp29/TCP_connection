@@ -39,3 +39,73 @@ void Server::in_work() {
     exit(1);
   }
 }
+
+int Server::threadclient(void *sockClient) {
+  int Client = *((int *)sockClient);
+
+  char recvbuf[BUFLEN];
+  char sendbuf[BUFLEN];
+  char name[BUFLEN];
+  char message[BUFLEN];
+  int msgLength;
+  size_t index;
+  for (int i = 1;; ++i) {
+    index = 0;
+    bzero(recvbuf, BUFLEN);
+    bzero(sendbuf, BUFLEN);
+    bzero(name, BUFLEN);
+    bzero(message, BUFLEN);
+
+    // recv
+    if ((msgLength = recv(Client, recvbuf, BUFLEN, 0)) < 0) {
+      perror("Плохое получение потоком\n");
+      printf("Итерация %d\n", i);
+      printf("sockClient in pthread: %d\n", Client);
+      printf("msgLength in pthread: %d\n", Client);
+      exit(1);
+    }
+
+    if (msgLength == 0) {
+      printf("Break in serv\n");
+      break;
+    }
+    //
+
+    for (int i = 0; recvbuf[i] != '.'; ++i) {
+      name[i] = recvbuf[i];
+      ++index;
+    }
+
+    index++;
+
+    for (int i = 0; index < strlen(recvbuf); ++i) {
+      message[i] = recvbuf[index];
+      index++;
+    }
+
+    strcat(sendbuf, name);
+    strcat(sendbuf, ": ");
+    strcat(sendbuf, message);
+
+    // send
+    for (auto i = sockets.begin(); i < sockets.end(); ++i) {
+      printf("Отправка клиенту %d\n", *i);
+      if (*i != Client)
+        send(*i, sendbuf, BUFLEN, 0);
+    }
+    //
+
+    printf("SERVER: Socket для клиента - %d\n", Client);
+    printf("SERVER: Длина сообщения - %d\n", msgLength);
+    printf("SERVER: Данные от клиента - %s\n", recvbuf);
+    printf("SERVER: Имя клиента - %s\n", name);
+    printf("SERVER: Сообщение - %s\n\n", message);
+  }
+
+  close(Client);
+  for (auto i = sockets.begin(); i < sockets.end(); ++i) {
+    if (*i == Client)
+      sockets.erase(i);
+  }
+  return 0;
+}
