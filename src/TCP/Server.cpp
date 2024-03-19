@@ -57,19 +57,13 @@ int Server::threadclient(void *sockClient) {
     bzero(message, BUFLEN);
 
     // recv
-    if ((msgLength = recv(Client, recvbuf, BUFLEN, 0)) < 0) {
-      perror("Плохое получение потоком\n");
-      printf("Итерация %d\n", i);
-      printf("sockClient in pthread: %d\n", Client);
-      printf("msgLength in pthread: %d\n", Client);
-      exit(1);
-    }
+    recv_msg(recvbuf, msgLength, Client);
+    //
 
     if (msgLength == 0) {
       printf("Break in serv\n");
       break;
     }
-    //
 
     for (int i = 0; recvbuf[i] != '.'; ++i) {
       name[i] = recvbuf[i];
@@ -111,5 +105,14 @@ void Server::send_msg(char *buf, int sockClient) {
     printf("Отправка клиенту %d\n", *i);
     if (*i != sockClient)
       send(*i, buf, BUFLEN, 0);
+  }
+}
+
+void Server::recv_msg(char *buf, int &msgLength, int sockClient) {
+  if ((msgLength = recv(sockClient, buf, BUFLEN, 0)) < 0) {
+    perror("Плохое получение потоком\n");
+    printf("sockClient in pthread: %d\n", sockClient);
+    printf("msgLength in pthread: %d\n", sockClient);
+    exit(1);
   }
 }
