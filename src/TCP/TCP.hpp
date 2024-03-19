@@ -15,3 +15,11 @@ protected:
   int length;
   struct sockaddr_in servAddr;
 };
+
+class Server : public TCP {
+public:
+  Server();
+
+  void send_msg() override;
+  void recv_msg() override;
+};
