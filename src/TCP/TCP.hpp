@@ -1,7 +1,13 @@
 #pragma once
 
+#include <cstdio>
+#include <cstdlib>
 #include <netinet/in.h>
+#include <pthread.h>
 #include <sys/socket.h>
+
+#define BUFLEN 81
+#define NTHRDS 5
 
 class TCP {
 public:
@@ -21,6 +27,9 @@ public:
 
   void send_msg() override;
   void recv_msg() override;
+
+private:
+  pthread_t thrds[NTHRDS];
 };
 
 class Client : public TCP {
