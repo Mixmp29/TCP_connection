@@ -15,7 +15,7 @@
 class TCP {
 public:
   virtual void send_msg(char *, int);
-  virtual void recv_msg();
+  virtual void recv_msg(char *, int &, int);
 
 protected:
   int sockMain;
@@ -31,7 +31,7 @@ public:
   int threadclient(void *sockClient);
 
   void send_msg(char *buf, int sockClient) override;
-  void recv_msg() override;
+  void recv_msg(char *buf, int &msgLength, int sockClient) override;
 
 private:
   std::vector<int> sockets;
