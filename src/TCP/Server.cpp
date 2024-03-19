@@ -88,11 +88,7 @@ int Server::threadclient(void *sockClient) {
     strcat(sendbuf, message);
 
     // send
-    for (auto i = sockets.begin(); i < sockets.end(); ++i) {
-      printf("Отправка клиенту %d\n", *i);
-      if (*i != Client)
-        send(*i, sendbuf, BUFLEN, 0);
-    }
+    send_msg(sendbuf, Client);
     //
 
     printf("SERVER: Socket для клиента - %d\n", Client);
@@ -108,4 +104,12 @@ int Server::threadclient(void *sockClient) {
       sockets.erase(i);
   }
   return 0;
+}
+
+void Server::send_msg(char *buf, int sockClient) {
+  for (auto i = sockets.begin(); i < sockets.end(); ++i) {
+    printf("Отправка клиенту %d\n", *i);
+    if (*i != sockClient)
+      send(*i, buf, BUFLEN, 0);
+  }
 }
