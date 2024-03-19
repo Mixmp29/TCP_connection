@@ -14,7 +14,7 @@
 
 class TCP {
 public:
-  virtual void send_msg();
+  virtual void send_msg(char *, int);
   virtual void recv_msg();
 
 protected:
@@ -30,7 +30,7 @@ public:
   void in_work();
   int threadclient(void *sockClient);
 
-  void send_msg() override;
+  void send_msg(char *buf, int sockClient) override;
   void recv_msg() override;
 
 private:
