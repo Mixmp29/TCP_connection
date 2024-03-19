@@ -5,7 +5,7 @@
 
 class TCP {
   int sockMain;
-  int sockClient;
+  int sockConnect;
   int length;
   struct sockaddr_in servAddr;
 };
