@@ -1,4 +1,4 @@
-#include "TCP.hpp"
+#include <TCP/TCP.hpp>
 
 Server::Server() {
   if ((sockMain = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
