@@ -1,7 +1,8 @@
 #include <TCP/TCP.hpp>
 #include <iostream>
 #include <sstream>
-#include <unordered_map>
+#include <string>
+#include <vector>
 
 Server::Server() {
   if ((sockMain = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
@@ -67,15 +68,24 @@ int Server::threadclient(int sockClient) {
       break;
     }
 
-    chat(recvbuf, sendbuf, name, message);
+    if (check(recvbuf) == "-parse") {
+      cmd = "-parse";
+      parse(recvbuf, sendbuf);
+
+      printf("SERVER: Socket для клиента - %d\n", sockClient);
+      printf("SERVER: Длина сообщения - %d\n", msgLength);
+      printf("SERVER: Данные для клиента - %s\n", sendbuf);
+    } else {
+      chat(recvbuf, sendbuf, name, message);
+
+      printf("SERVER: Socket для клиента - %d\n", sockClient);
+      printf("SERVER: Длина сообщения - %d\n", msgLength);
+      printf("SERVER: Данные от клиента - %s\n", recvbuf);
+      printf("SERVER: Имя клиента - %s\n", name);
+      printf("SERVER: Сообщение - %s\n\n", message);
+    }
 
     send_msg(sendbuf, sockClient);
-
-    printf("SERVER: Socket для клиента - %d\n", sockClient);
-    printf("SERVER: Длина сообщения - %d\n", msgLength);
-    printf("SERVER: Данные от клиента - %s\n", recvbuf);
-    printf("SERVER: Имя клиента - %s\n", name);
-    printf("SERVER: Сообщение - %s\n\n", message);
   }
 
   close(sockClient);
@@ -88,10 +98,15 @@ int Server::threadclient(int sockClient) {
 }
 
 void Server::send_msg(char *buf, int sockClient) {
-  for (auto i = sockets.begin(); i < sockets.end(); ++i) {
-    printf("Отправка клиенту %d\n", *i);
-    if (*i != sockClient)
-      send(*i, buf, BUFLEN, 0);
+  if (cmd == "-parse") {
+    send(sockClient, buf, BUFLEN, 0);
+    cmd = "";
+  } else {
+    for (auto i = sockets.begin(); i < sockets.end(); ++i) {
+      printf("Отправка клиенту %d\n", *i);
+      if (*i != sockClient)
+        send(*i, buf, BUFLEN, 0);
+    }
   }
 }
 
@@ -102,6 +117,56 @@ void Server::recv_msg(char *buf, int &msgLength, int sockClient) {
     printf("Длина сообщения в потоке: %d\n", sockClient);
     exit(1);
   }
+}
+
+std::string Server::check(char *recvbuf) {
+  std::string name, command;
+  std::istringstream buf(recvbuf);
+
+  std::getline(buf, name, '.');
+  std::getline(buf, command, ' ');
+
+  return command;
+}
+
+void Server::parse(char *recvbuf, char *sendbuf) {
+  std::string name, command, string;
+  std::string message, count;
+  std::string result;
+  std::vector<std::pair<char, int>> map;
+
+  std::istringstream buf(recvbuf);
+
+  std::getline(buf, name, '.');
+  std::getline(buf, command, ' ');
+  std::getline(buf, string);
+
+  for (auto &symbol : string) {
+    bool repeat = false;
+
+    for (auto &pair : map)
+      if (pair.first == symbol)
+        repeat = true;
+
+    if (repeat)
+      continue;
+    else
+      map.push_back(std::pair(symbol, 0));
+  }
+
+  for (auto &pair : map)
+    for (auto &symbol : string)
+      if (pair.first == symbol)
+        ++pair.second;
+
+  for (auto &[key, val] : map) {
+    message += key;
+    count += std::to_string(val) + " ";
+  }
+
+  result += command + '.' + string + '.' + message + '.' + count;
+
+  strcat(sendbuf, result.c_str());
 }
 
 void Server::chat(char *recvbuf, char *sendbuf, char *name, char *message) {

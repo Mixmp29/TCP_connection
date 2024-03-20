@@ -1,5 +1,7 @@
 #include <TCP/TCP.hpp>
 #include <iostream>
+#include <sstream>
+#include <string>
 
 Client::Client(char *ip, int port) {
   struct hostent *hp;
@@ -64,7 +66,10 @@ int Client::threadrecv(int sockClient) {
       break;
     }
 
-    printf("\n%s\n\n", buf);
+    if (check(buf) == "-parse")
+      print_parse(buf);
+    else
+      printf("\n%s\n\n", buf);
   }
 
   close(sockClient);
@@ -86,4 +91,35 @@ void Client::recv_msg(char *buf, int &msgLength, int sockClient) {
     printf("Длина сообщения в потоке: %d\n", sockClient);
     exit(1);
   }
+}
+
+std::string Client::check(char *recvbuf) {
+  std::string command;
+  std::istringstream buf(recvbuf);
+
+  std::getline(buf, command, '.');
+
+  return command;
+}
+
+void Client::print_parse(char *recvbuf) {
+  std::string command, string, message, count;
+  std::istringstream buf(recvbuf);
+
+  std::getline(buf, command, '.');
+  std::getline(buf, string, '.');
+  std::getline(buf, message, '.');
+  std::getline(buf, count);
+
+  std::istringstream val(count);
+  printf("\nMessage   %s", string.c_str());
+
+  for (auto &symbol : message) {
+    std::string cnt;
+    val >> cnt;
+
+    printf("\n%c \t  %s", symbol, cnt.c_str());
+  }
+
+  printf("\n\n");
 }
