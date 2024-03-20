@@ -29,12 +29,12 @@ class Server : public TCP {
 public:
   Server();
   void in_work();
-  int threadclient(int sockClient);
 
+private:
+  int threadclient(int sockClient);
   void send_msg(char *buf, int sockClient) override;
   void recv_msg(char *buf, int &msgLength, int sockClient) override;
 
-private:
   std::string check(char *recvbuf);
   void parse(char *recvbuf, char *sendbuf);
   void get_usr_cnt(char *recvbuf, char *sendbuf);
@@ -50,13 +50,13 @@ public:
   Client(char *ip, int port);
 
   void run();
+
+private:
   int threadsend(int sockClient);
   int threadrecv(int sockClient);
-
   void send_msg(char *buf, int sockClient) override;
   void recv_msg(char *buf, int &msgLength, int sockClient) override;
 
-private:
   std::string check(char *recvbuf);
   void print_parse(char *recvbuf);
   void print_usr_cnt(char *recvbuf);
