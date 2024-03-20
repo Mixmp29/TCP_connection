@@ -44,6 +44,7 @@ class Client : public TCP {
 public:
   Client(char *ip, int port);
 
+  void run();
   void send_msg(char *buf, int sockClient) override;
   void recv_msg(char *buf, int &msgLength, int sockClient) override;
 };

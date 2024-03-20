@@ -1,12 +1,9 @@
 #include <TCP/TCP.hpp>
 
 Client::Client(char *ip, int port) {
-  int sock;
-  struct sockaddr_in servAddr;
   struct hostent *hp;
-  pthread_t tid[2];
 
-  if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
+  if ((sockMain = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
     perror("Не могу получить socket\n");
     exit(1);
   }
@@ -16,4 +13,19 @@ Client::Client(char *ip, int port) {
   hp = gethostbyname(ip);
   bcopy(hp->h_addr_list[0], &servAddr.sin_addr, hp->h_length);
   servAddr.sin_port = htons(port);
+}
+
+void Client::run() {
+  if (connect(sockMain, (struct sockaddr *)&servAddr, sizeof(servAddr)) < 0) {
+    perror("Клиент не может соединиться.\n");
+    exit(1);
+  } else {
+    printf("Успешное подключение к серверу.\n");
+  }
+
+  std::thread thrd1(Client::send_msg, this, sockMain);
+  std::thread thrd2(Client::send_msg, this, sockMain);
+
+  thrd1.join();
+  thrd2.join();
 }
