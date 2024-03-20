@@ -74,7 +74,16 @@ int Server::threadclient(int sockClient) {
 
       printf("SERVER: Socket для клиента - %d\n", sockClient);
       printf("SERVER: Длина сообщения - %d\n", msgLength);
-      printf("SERVER: Данные для клиента - %s\n", sendbuf);
+      printf("SERVER: Данные для клиента - %s\n\n", sendbuf);
+
+    } else if (check(recvbuf) == "-get_users_count") {
+      cmd = "-get_users_count";
+      get_usr_cnt(recvbuf, sendbuf);
+
+      printf("SERVER: Socket для клиента - %d\n", sockClient);
+      printf("SERVER: Длина сообщения - %d\n", msgLength);
+      printf("SERVER: Данные для клиента - %s\n\n", sendbuf);
+
     } else {
       chat(recvbuf, sendbuf, name, message);
 
@@ -98,7 +107,7 @@ int Server::threadclient(int sockClient) {
 }
 
 void Server::send_msg(char *buf, int sockClient) {
-  if (cmd == "-parse") {
+  if (cmd == "-parse" || cmd == "-get_users_count") {
     send(sockClient, buf, BUFLEN, 0);
     cmd = "";
   } else {
@@ -107,6 +116,7 @@ void Server::send_msg(char *buf, int sockClient) {
       if (*i != sockClient)
         send(*i, buf, BUFLEN, 0);
     }
+    printf("\n\n");
   }
 }
 
@@ -165,6 +175,20 @@ void Server::parse(char *recvbuf, char *sendbuf) {
   }
 
   result += command + '.' + string + '.' + message + '.' + count;
+
+  strcat(sendbuf, result.c_str());
+}
+
+void Server::get_usr_cnt(char *recvbuf, char *sendbuf) {
+  std::string name, command;
+  std::string result;
+
+  std::istringstream buf(recvbuf);
+
+  std::getline(buf, name, '.');
+  std::getline(buf, command, ' ');
+
+  result += command + '.' + std::to_string(sockets.size());
 
   strcat(sendbuf, result.c_str());
 }

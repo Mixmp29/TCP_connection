@@ -37,6 +37,7 @@ public:
 private:
   std::string check(char *recvbuf);
   void parse(char *recvbuf, char *sendbuf);
+  void get_usr_cnt(char *recvbuf, char *sendbuf);
   void chat(char *recvbuf, char *sendbuf, char *name, char *message);
 
   std::string cmd;
@@ -58,4 +59,5 @@ public:
 private:
   std::string check(char *recvbuf);
   void print_parse(char *recvbuf);
+  void print_usr_cnt(char *recvbuf);
 };

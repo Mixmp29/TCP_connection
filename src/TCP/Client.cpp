@@ -68,6 +68,8 @@ int Client::threadrecv(int sockClient) {
 
     if (check(buf) == "-parse")
       print_parse(buf);
+    else if (check(buf) == "-get_users_count")
+      print_usr_cnt(buf);
     else
       printf("\n%s\n\n", buf);
   }
@@ -120,6 +122,18 @@ void Client::print_parse(char *recvbuf) {
 
     printf("\n%c \t  %s", symbol, cnt.c_str());
   }
+
+  printf("\n\n");
+}
+
+void Client::print_usr_cnt(char *recvbuf) {
+  std::string command, count;
+  std::istringstream buf(recvbuf);
+
+  std::getline(buf, command, '.');
+  std::getline(buf, count);
+
+  printf("\nКоличество клиентов на сервере: %s", count.c_str());
 
   printf("\n\n");
 }
