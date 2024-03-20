@@ -1,4 +1,5 @@
 #include "TCP.hpp"
+#include <iostream>
 
 Server::Server() {
   if ((sockMain = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
@@ -16,6 +17,13 @@ Server::Server() {
     exit(1);
   }
 
+  length = sizeof(servAddr);
+  if (getsockname(sockMain, (struct sockaddr *)&servAddr,
+                  (socklen_t *)&length)) {
+    perror("Вызов getsockname неудачен.");
+    exit(1);
+  }
+
   printf("SERVER: Номер sid: %d\n", sockMain);
   printf("SERVER: IP-адресс: %d\n", ntohs(servAddr.sin_addr.s_addr));
   printf("SERVER: номер порта - % d\n\n", ntohs(servAddr.sin_port));
@@ -24,24 +32,22 @@ Server::Server() {
 }
 
 void Server::in_work() {
-  if ((sockConnect = accept(sockMain, 0, 0)) < 0) {
-    perror("Неверный socket для клиента.");
-    exit(1);
-  }
+  for (;;) {
+    if ((sockConnect = accept(sockMain, 0, 0)) < 0) {
+      perror("Неверный socket для клиента.");
+      exit(1);
+    }
 
-  sockets.push_back(sockConnect);
+    sockets.push_back(sockConnect);
 
-  printf("sockClient: %d\n", sockConnect);
+    printf("sockClient: %d\n", sockConnect);
 
-  if (pthread_create(&thrds[sockConnect], NULL, (void *(*)(void *))threadclient,
-                     (void *)&sockConnect) < 0) {
-    perror("Ошибка создания потока.");
-    exit(1);
+    thrds.push_back(std::jthread(&Server::threadclient, this, sockConnect));
   }
 }
 
-int Server::threadclient(void *sockClient) {
-  int Client = *((int *)sockClient);
+int Server::threadclient(int sockClient) {
+  int Client = sockClient;
 
   char recvbuf[BUFLEN];
   char sendbuf[BUFLEN];
@@ -93,6 +99,7 @@ int Server::threadclient(void *sockClient) {
   }
 
   close(Client);
+
   for (auto i = sockets.begin(); i < sockets.end(); ++i) {
     if (*i == Client)
       sockets.erase(i);

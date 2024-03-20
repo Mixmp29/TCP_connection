@@ -3,9 +3,9 @@
 #include <cstdio>
 #include <cstdlib>
 #include <netinet/in.h>
-#include <pthread.h>
 #include <string.h>
 #include <sys/socket.h>
+#include <thread>
 #include <unistd.h>
 #include <vector>
 
@@ -14,8 +14,8 @@
 
 class TCP {
 public:
-  virtual void send_msg(char *, int);
-  virtual void recv_msg(char *, int &, int);
+  virtual void send_msg(char *, int){};
+  virtual void recv_msg(char *, int &, int){};
 
 protected:
   int sockMain;
@@ -28,20 +28,20 @@ class Server : public TCP {
 public:
   Server();
   void in_work();
-  int threadclient(void *sockClient);
+  int threadclient(int sockClient);
 
   void send_msg(char *buf, int sockClient) override;
   void recv_msg(char *buf, int &msgLength, int sockClient) override;
 
 private:
   std::vector<int> sockets;
-  pthread_t thrds[NTHRDS];
+  std::vector<std::jthread> thrds;
 };
 
-class Client : public TCP {
+/* class Client : public TCP {
 public:
   Client(int ip, int port);
 
   void send_msg() override;
   void recv_msg() override;
-};
+}; */
