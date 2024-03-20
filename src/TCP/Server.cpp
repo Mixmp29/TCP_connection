@@ -1,4 +1,6 @@
 #include <TCP/TCP.hpp>
+#include <iostream>
+#include <sstream>
 
 Server::Server() {
   if ((sockMain = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
@@ -102,18 +104,15 @@ void Server::recv_msg(char *buf, int &msgLength, int sockClient) {
 }
 
 void Server::chat(char *recvbuf, char *sendbuf, char *name, char *message) {
-  size_t index = 0;
-  for (int i = 0; recvbuf[i] != '.'; ++i) {
-    name[i] = recvbuf[i];
-    ++index;
-  }
+  std::string s_name, s_message;
 
-  index++;
+  std::istringstream str(recvbuf);
 
-  for (int i = 0; index < strlen(recvbuf); ++i) {
-    message[i] = recvbuf[index];
-    index++;
-  }
+  std::getline(str, s_name, '.');
+  std::getline(str, s_message);
+
+  strcat(name, s_name.c_str());
+  strcat(message, s_message.c_str());
 
   strcat(sendbuf, name);
   strcat(sendbuf, ": ");
