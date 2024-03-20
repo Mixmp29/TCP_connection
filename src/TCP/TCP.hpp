@@ -15,9 +15,8 @@
 
 class TCP {
 public:
-  // поправить абстракцию
-  virtual void send_msg(char *, int){};
-  virtual void recv_msg(char *, int &, int){};
+  virtual void send_msg(char *, int) = 0;
+  virtual void recv_msg(char *, int &, int) = 0;
 
 protected:
   int sockMain;
