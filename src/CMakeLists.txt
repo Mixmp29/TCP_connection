@@ -1,7 +1,7 @@
 add_executable(server TCP/tcpserv.cpp)
 add_executable(client TCP/tcpclient.cpp)
 
-add_library(TCP STATIC TCP/TCP.hpp TCP/Server.cpp)
+add_library(TCP STATIC TCP/TCP.hpp TCP/Server.cpp TCP/Client)
 
 include(CompileOptions)
 
