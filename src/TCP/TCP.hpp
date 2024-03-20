@@ -45,6 +45,9 @@ public:
   Client(char *ip, int port);
 
   void run();
+  int threadsend(int sockClient);
+  int threadrecv(int sockClient);
+
   void send_msg(char *buf, int sockClient) override;
   void recv_msg(char *buf, int &msgLength, int sockClient) override;
 };
