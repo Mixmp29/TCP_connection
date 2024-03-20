@@ -5,7 +5,7 @@ Client::Client(char *ip, int port) {
   struct hostent *hp;
 
   if ((sockMain = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
-    perror("Не могу получить socket\n");
+    perror("Не удалось получить socket\n");
     exit(1);
   }
 
@@ -21,7 +21,7 @@ void Client::run() {
     perror("Клиент не может соединиться.\n");
     exit(1);
   } else {
-    printf("Успешное подключение к серверу.\n");
+    printf("Успешное подключение к серверу.\n\n");
   }
 
   std::thread thrd1(&Client::threadsend, this, sockMain);
@@ -32,14 +32,12 @@ void Client::run() {
 }
 
 int Client::threadsend(int sockClient) {
-  int Client = sockClient;
-
   char name[BUFLEN];
   char message[BUFLEN];
   char buf[BUFLEN];
-  printf("What is your name?\n\n");
+  printf("Введите своё имя: ");
   scanf("%s", name);
-  printf("\nYou can type message now %s\n\n", name);
+  printf("\nТеперь вы можете писать сообщения, %s.\n\n", name);
   strcat(name, ".");
   for (;;) {
     bzero(buf, BUFLEN);
@@ -47,35 +45,29 @@ int Client::threadsend(int sockClient) {
     strcat(buf, name);
     strcat(buf, message);
     if (strlen(message) > 0) {
-      // send
-      send_msg(buf, Client);
-      //
+      send_msg(buf, sockClient);
     }
   }
 
-  close(Client);
+  close(sockClient);
   return 0;
 }
 
 int Client::threadrecv(int sockClient) {
-  int Client = sockClient;
-
   char buf[BUFLEN];
   int msgLength = 0;
-  for (int i = 1;; ++i) {
-    // recv
-    recv_msg(buf, msgLength, Client);
-    //
+  for (;;) {
+    recv_msg(buf, msgLength, sockClient);
 
     if (msgLength == 0) {
-      printf("\nBreak in recv\n");
+      printf("\nРазрыв с сервером.\n");
       break;
     }
 
     printf("\n%s\n\n", buf);
   }
 
-  close(Client);
+  close(sockClient);
   return 0;
 }
 
@@ -90,8 +82,8 @@ void Client::recv_msg(char *buf, int &msgLength, int sockClient) {
   bzero(buf, BUFLEN);
   if ((msgLength = recv(sockClient, buf, BUFLEN, 0)) < 0) {
     perror("Плохое получение потоком\n");
-    printf("sockClient in pthread: %d\n", sockClient);
-    printf("msgLength in pthread: %d\n", sockClient);
+    printf("Socket клиента в потоке: %d\n", sockClient);
+    printf("Длина сообщения в потоке: %d\n", sockClient);
     exit(1);
   }
 }

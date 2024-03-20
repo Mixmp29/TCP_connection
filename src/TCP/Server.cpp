@@ -23,9 +23,9 @@ Server::Server() {
     exit(1);
   }
 
-  printf("SERVER: Номер sid: %d\n", sockMain);
-  printf("SERVER: IP-адресс: %d\n", ntohs(servAddr.sin_addr.s_addr));
-  printf("SERVER: номер порта - % d\n\n", ntohs(servAddr.sin_port));
+  printf("SERVER: Номер sid - %d\n", sockMain);
+  printf("SERVER: IP-адресс - %d\n", ntohs(servAddr.sin_addr.s_addr));
+  printf("SERVER: Номер порта - %d\n\n", ntohs(servAddr.sin_port));
 
   listen(sockMain, NTHRDS);
 }
@@ -39,34 +39,30 @@ void Server::in_work() {
 
     sockets.push_back(sockConnect);
 
-    printf("sockClient: %d\n", sockConnect);
+    printf("Socket клиента: %d\n", sockConnect);
 
     thrds.push_back(std::jthread(&Server::threadclient, this, sockConnect));
   }
 }
 
 int Server::threadclient(int sockClient) {
-  int Client = sockClient;
-
   char recvbuf[BUFLEN];
   char sendbuf[BUFLEN];
   char name[BUFLEN];
   char message[BUFLEN];
   int msgLength;
   size_t index;
-  for (int i = 1;; ++i) {
+  for (;;) {
     index = 0;
     bzero(recvbuf, BUFLEN);
     bzero(sendbuf, BUFLEN);
     bzero(name, BUFLEN);
     bzero(message, BUFLEN);
 
-    // recv
-    recv_msg(recvbuf, msgLength, Client);
-    //
+    recv_msg(recvbuf, msgLength, sockClient);
 
     if (msgLength == 0) {
-      printf("Break in serv\n");
+      printf("Разрыв с клиентом %d\n", sockClient);
       break;
     }
 
@@ -86,21 +82,19 @@ int Server::threadclient(int sockClient) {
     strcat(sendbuf, ": ");
     strcat(sendbuf, message);
 
-    // send
-    send_msg(sendbuf, Client);
-    //
+    send_msg(sendbuf, sockClient);
 
-    printf("SERVER: Socket для клиента - %d\n", Client);
+    printf("SERVER: Socket для клиента - %d\n", sockClient);
     printf("SERVER: Длина сообщения - %d\n", msgLength);
     printf("SERVER: Данные от клиента - %s\n", recvbuf);
     printf("SERVER: Имя клиента - %s\n", name);
     printf("SERVER: Сообщение - %s\n\n", message);
   }
 
-  close(Client);
+  close(sockClient);
 
   for (auto i = sockets.begin(); i < sockets.end(); ++i) {
-    if (*i == Client)
+    if (*i == sockClient)
       sockets.erase(i);
   }
   return 0;
@@ -117,8 +111,8 @@ void Server::send_msg(char *buf, int sockClient) {
 void Server::recv_msg(char *buf, int &msgLength, int sockClient) {
   if ((msgLength = recv(sockClient, buf, BUFLEN, 0)) < 0) {
     perror("Плохое получение потоком\n");
-    printf("sockClient in pthread: %d\n", sockClient);
-    printf("msgLength in pthread: %d\n", sockClient);
+    printf("Socket клиента в потоке: %d\n", sockClient);
+    printf("Длина сообщения в потоке: %d\n", sockClient);
     exit(1);
   }
 }
