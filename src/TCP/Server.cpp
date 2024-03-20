@@ -51,9 +51,7 @@ int Server::threadclient(int sockClient) {
   char name[BUFLEN];
   char message[BUFLEN];
   int msgLength;
-  size_t index;
   for (;;) {
-    index = 0;
     bzero(recvbuf, BUFLEN);
     bzero(sendbuf, BUFLEN);
     bzero(name, BUFLEN);
@@ -66,21 +64,7 @@ int Server::threadclient(int sockClient) {
       break;
     }
 
-    for (int i = 0; recvbuf[i] != '.'; ++i) {
-      name[i] = recvbuf[i];
-      ++index;
-    }
-
-    index++;
-
-    for (int i = 0; index < strlen(recvbuf); ++i) {
-      message[i] = recvbuf[index];
-      index++;
-    }
-
-    strcat(sendbuf, name);
-    strcat(sendbuf, ": ");
-    strcat(sendbuf, message);
+    chat(recvbuf, sendbuf, name, message);
 
     send_msg(sendbuf, sockClient);
 
@@ -115,4 +99,23 @@ void Server::recv_msg(char *buf, int &msgLength, int sockClient) {
     printf("Длина сообщения в потоке: %d\n", sockClient);
     exit(1);
   }
+}
+
+void Server::chat(char *recvbuf, char *sendbuf, char *name, char *message) {
+  size_t index = 0;
+  for (int i = 0; recvbuf[i] != '.'; ++i) {
+    name[i] = recvbuf[i];
+    ++index;
+  }
+
+  index++;
+
+  for (int i = 0; index < strlen(recvbuf); ++i) {
+    message[i] = recvbuf[index];
+    index++;
+  }
+
+  strcat(sendbuf, name);
+  strcat(sendbuf, ": ");
+  strcat(sendbuf, message);
 }
