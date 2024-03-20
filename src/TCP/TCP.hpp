@@ -35,7 +35,11 @@ public:
   void recv_msg(char *buf, int &msgLength, int sockClient) override;
 
 private:
+  std::string check(char *recvbuf);
+  void parse(char *recvbuf, char *sendbuf);
   void chat(char *recvbuf, char *sendbuf, char *name, char *message);
+
+  std::string cmd;
   std::vector<int> sockets;
   std::vector<std::jthread> thrds;
 };
@@ -50,4 +54,8 @@ public:
 
   void send_msg(char *buf, int sockClient) override;
   void recv_msg(char *buf, int &msgLength, int sockClient) override;
+
+private:
+  std::string check(char *recvbuf);
+  void print_parse(char *recvbuf);
 };
