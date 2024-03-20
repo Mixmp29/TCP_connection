@@ -2,6 +2,7 @@
 
 #include <cstdio>
 #include <cstdlib>
+#include <netdb.h>
 #include <netinet/in.h>
 #include <string.h>
 #include <sys/socket.h>
@@ -14,6 +15,7 @@
 
 class TCP {
 public:
+  // поправить абстракцию
   virtual void send_msg(char *, int){};
   virtual void recv_msg(char *, int &, int){};
 
@@ -38,10 +40,10 @@ private:
   std::vector<std::jthread> thrds;
 };
 
-/* class Client : public TCP {
+class Client : public TCP {
 public:
-  Client(int ip, int port);
+  Client(char *ip, int port);
 
-  void send_msg() override;
-  void recv_msg() override;
-}; */
+  void send_msg(char *buf, int sockClient) override;
+  void recv_msg(char *buf, int &msgLength, int sockClient) override;
+};
