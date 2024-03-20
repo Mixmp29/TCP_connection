@@ -1,6 +1,7 @@
 #include <TCP/TCP.hpp>
 #include <iostream>
 #include <sstream>
+#include <unordered_map>
 
 Server::Server() {
   if ((sockMain = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
@@ -106,10 +107,10 @@ void Server::recv_msg(char *buf, int &msgLength, int sockClient) {
 void Server::chat(char *recvbuf, char *sendbuf, char *name, char *message) {
   std::string s_name, s_message;
 
-  std::istringstream str(recvbuf);
+  std::istringstream buf(recvbuf);
 
-  std::getline(str, s_name, '.');
-  std::getline(str, s_message);
+  std::getline(buf, s_name, '.');
+  std::getline(buf, s_message);
 
   strcat(name, s_name.c_str());
   strcat(message, s_message.c_str());
