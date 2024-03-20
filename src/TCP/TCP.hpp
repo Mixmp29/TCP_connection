@@ -60,4 +60,5 @@ private:
   std::string check(char *recvbuf);
   void print_parse(char *recvbuf);
   void print_usr_cnt(char *recvbuf);
+  int reconnect(int &sockClient);
 };

@@ -10,10 +10,13 @@ Server::Server() {
     exit(1);
   }
 
+  int optval = 1;
+  setsockopt(sockMain, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(int));
+
   bzero((char *)&servAddr, sizeof(servAddr));
   servAddr.sin_family = AF_INET;
   servAddr.sin_addr.s_addr = htonl(INADDR_ANY);
-  servAddr.sin_port = 0;
+  servAddr.sin_port = htons(54321);
 
   if (bind(sockMain, (struct sockaddr *)&servAddr, sizeof(servAddr))) {
     perror("Связывание сервера неудачно.");

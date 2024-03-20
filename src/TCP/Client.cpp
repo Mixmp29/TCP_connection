@@ -63,7 +63,9 @@ int Client::threadrecv(int sockClient) {
 
     if (msgLength == 0) {
       printf("\nРазрыв с сервером.\n");
-      break;
+      if (reconnect(sockClient) == 1)
+        exit(1);
+      // break;
     }
 
     if (check(buf) == "-parse")
@@ -136,4 +138,21 @@ void Client::print_usr_cnt(char *recvbuf) {
   printf("\nКоличество клиентов на сервере: %s", count.c_str());
 
   printf("\n\n");
+}
+
+int Client::reconnect(int &sockClient) {
+  for (int i = 0; i < 5; ++i) {
+    printf("Попытка переподключения...\n");
+    sleep(5);
+
+    close(sockClient);
+    sockClient = socket(AF_INET, SOCK_STREAM, 0);
+    if (connect(sockMain, (struct sockaddr *)&servAddr, sizeof(servAddr)) >=
+        0) {
+      printf("\nУспешное переподключение.\n");
+      return 0;
+    }
+  }
+  printf("\nНе удалось переподключиться. Завершение сеанса.\n");
+  return 1;
 }
