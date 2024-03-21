@@ -44,6 +44,7 @@ int Client::threadsend(int sockClient) {
   for (;;) {
     bzero(buf, BUFLEN);
     std::cin.getline(message, BUFLEN);
+    printf("\n");
     strcat(buf, name);
     strcat(buf, message);
     if (strlen(message) > 0) {
@@ -73,7 +74,7 @@ int Client::threadrecv(int sockClient) {
     else if (check(buf) == "-get_users_count")
       print_usr_cnt(buf);
     else
-      printf("\n%s\n\n", buf);
+      printf("%s\n\n", buf);
   }
 
   close(sockClient);
@@ -116,7 +117,7 @@ void Client::print_parse(char *recvbuf) {
   std::getline(buf, count);
 
   std::istringstream val(count);
-  printf("\nMessage   %s", string.c_str());
+  printf("Message   %s", string.c_str());
 
   for (auto &symbol : message) {
     std::string cnt;
