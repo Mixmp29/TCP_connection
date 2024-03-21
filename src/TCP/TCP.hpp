@@ -28,9 +28,11 @@ protected:
 class Server : public TCP {
 public:
   Server();
+  Server(int port);
   void in_work();
 
 private:
+  void settings(int port);
   int threadclient(int sockClient);
   void send_msg(char *buf, int sockClient) override;
   void recv_msg(char *buf, int &msgLength, int sockClient) override;

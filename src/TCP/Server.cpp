@@ -4,7 +4,11 @@
 #include <string>
 #include <vector>
 
-Server::Server() {
+Server::Server() { settings(0); }
+
+Server::Server(int port) { settings(port); }
+
+void Server::settings(int port) {
   if ((sockMain = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
     perror("Сервер не может открыть главный socket");
     exit(1);
@@ -16,7 +20,7 @@ Server::Server() {
   bzero((char *)&servAddr, sizeof(servAddr));
   servAddr.sin_family = AF_INET;
   servAddr.sin_addr.s_addr = htonl(INADDR_ANY);
-  servAddr.sin_port = htons(54321);
+  servAddr.sin_port = htons(port);
 
   if (bind(sockMain, (struct sockaddr *)&servAddr, sizeof(servAddr))) {
     perror("Связывание сервера неудачно.");
