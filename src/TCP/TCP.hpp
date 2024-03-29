@@ -23,6 +23,8 @@ protected:
   int sockConnect;
   int length;
   struct sockaddr_in servAddr;
+
+  virtual ~TCP() = default;
 };
 
 class Server : public TCP {
